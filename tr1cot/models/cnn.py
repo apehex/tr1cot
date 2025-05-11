@@ -29,6 +29,7 @@ class UnetDiffusionModel(mlable.models.diffusion.LatentDiffusionModel):
         self._config.update({'block_num': block_num, 'latent_dim': [latent_dim] if isinstance(latent_dim, int) else list(latent_dim),})
         # layers
         self._match_block = None
+        self._extend_block = None
         self._concat_block = None
         self._embed_height_block = None
         self._embed_width_block = None
@@ -48,6 +49,7 @@ class UnetDiffusionModel(mlable.models.diffusion.LatentDiffusionModel):
         super(UnetDiffusionModel, self).build(__shape_o)
         # init
         self._match_block = tf.keras.layers.UpSampling2D(size=__shape_o[1:3], interpolation="nearest")
+        self._extend_block = tf.keras.layers.Dense(units=__shape_o[-1], use_bias=True, kernel_initializer='zeros')
         self._concat_block = tf.keras.layers.Concatenate(axis=-1)
         self._embed_height_block = mlable.layers.embedding.PositionalEmbedding(sequence_axis=1, feature_axis=-1)
         self._embed_width_block = mlable.layers.embedding.PositionalEmbedding(sequence_axis=2, feature_axis=-1)
@@ -55,10 +57,12 @@ class UnetDiffusionModel(mlable.models.diffusion.LatentDiffusionModel):
         self._encode_blocks = [tr1cot.layers.convolution.DownBlock(block_dim=__d, block_num=self._config['block_num']) for __d in self._config['latent_dim'][1:]]
         self._transform_blocks = [tr1cot.layers.convolution.ResidualBlock(latent_dim=self._config['latent_dim'][-1]) for _ in range(self._config['block_num'])]
         self._decode_blocks = [tr1cot.layers.convolution.UpBlock(block_dim=__d, block_num=self._config['block_num']) for __d in reversed(self._config['latent_dim'][:-1])]
-        self._project_block = tf.keras.layers.Dense(units=__shape_o[-1], kernel_initializer='zeros')
+        self._project_block = tf.keras.layers.Dense(units=__shape_o[-1], use_bias=True, kernel_initializer='zeros')
         # build
         self._match_block.build(__shape_v)
         __shape_v = self._match_block.compute_output_shape(__shape_v)
+        self._extend_block.build(__shape_v)
+        __shape_v = self._extend_block.compute_output_shape(__shape_v)
         self._concat_block.build([__shape_o, __shape_v])
         __shape_o = self._concat_block.compute_output_shape([__shape_o, __shape_v])
         self._embed_height_block.build(__shape_o)
@@ -87,12 +91,14 @@ class UnetDiffusionModel(mlable.models.diffusion.LatentDiffusionModel):
         __outputs, __variances = tf.cast(inputs[0], dtype=__dtype), tf.cast(inputs[-1], dtype=__dtype)
         # match (B, 1, 1, 1) => (B, H, W, 1)
         __variances = self._match_block(__variances)
-        # merge (B, H, W, E) + (B, H, W, 1) => (B, H, W, E+1)
+        # extend (B, H, W, 1) => (B, H, W, E)
+        __variances = self._extend_block(__variances)
+        # merge (B, H, W, E) + (B, H, W, E) => (B, H, W, 2*E)
         __outputs = self._concat_block([__outputs, __variances])
-        # embed the spatial axes (B, H, W, E+1)
+        # embed the spatial axes (B, H, W, 2*E)
         __outputs = self._embed_height_block(__outputs)
         __outputs = self._embed_width_block(__outputs)
-        # even (B, H, W, E+1) => (B, H, W, L)
+        # even (B, H, W, 2*E) => (B, H, W, L)
         __outputs = self._even_block(__outputs)
         # save residuals that skip the whole sampling process
         __residuals = __outputs
