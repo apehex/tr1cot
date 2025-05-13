@@ -49,6 +49,14 @@ np.array(list('ヒルベルト曲線'.encode('utf-32-be'))).reshape((-1, 4))
 
 For the rest of this article, text will be displayed both as characters and RGB pixels.
 
+- uppercase = deeper shade (lower codepoint => lower RGB value)
+- punctuation is darker (lower codepoints)
+- visual segmentation of the alphabets
+
+- basic RGB: biased, the colors are grouped in clusters (per alphabet), but proximity is meaningful
+- mixed RGB: irregular colors (close codepoints can have very colors) but spread across the RGB space
+- Hilbert: amplitude spread over the 3 channels, darker colors, close codepoints have close colors
+
 ## 2D Text
 
 => autoregressive sampling, lots of iterations
