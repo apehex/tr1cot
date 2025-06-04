@@ -2,7 +2,7 @@ import math
 
 import tensorflow as tf
 
-import mlable.blocks.transformer
+import mlable.blocks.attention.transformer
 import mlable.layers.embedding
 import mlable.layers.shaping
 import mlable.blocks.shaping
@@ -64,7 +64,7 @@ class PatchTransformerBlock(tf.keras.layers.Layer):
         self._unpatch_space = mlable.blocks.shaping.PixelShuffle(patch_dim=__patch_dim, height_axis=1, width_axis=2)
         self._merge_space = mlable.layers.shaping.Merge(axis=1, right=True)
         self._split_space = mlable.layers.shaping.Divide(axis=1, factor=__width_dim // __patch_dim, insert=True, right=True)
-        self._attend_space = mlable.blocks.transformer.ResidualDecoderBlock(head_num=__head_num, key_dim=__head_dim, value_dim=__head_dim, hidden_dim=__hidden_dim, attention_axes=[1], epsilon=self._config['epsilon_rate'], dropout_rate=self._config['dropout_rate'], use_position=False, use_bias=True, center=True, scale=True)
+        self._attend_space = mlable.blocks.attention.transformer.ResidualDecoderBlock(head_num=__head_num, key_dim=__head_dim, value_dim=__head_dim, hidden_dim=__hidden_dim, attention_axes=[1], epsilon=self._config['epsilon_rate'], dropout_rate=self._config['dropout_rate'], use_bias=True, center=True, scale=True)
         # built with the specific shape, at each step
         self._patch_space.build(input_shape)
         self._merge_space.build((__batch_dim, __height_dim // __patch_dim, __width_dim // __patch_dim, __latent_dim))
