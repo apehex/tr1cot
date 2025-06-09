@@ -15,7 +15,7 @@ END_RATE = 0.02 # signal rate at the end of the forward diffusion process
 # END-TO-END ###################################################################
 
 @tf.keras.utils.register_keras_serializable(package='models')
-class UnetDiffusionModel(mlable.models.diffusion.LatentDiffusionModel):
+class CnnDiffusionModel(mlable.models.diffusion.LatentDiffusionModel):
     def __init__(
         self,
         block_num: int,
@@ -24,7 +24,7 @@ class UnetDiffusionModel(mlable.models.diffusion.LatentDiffusionModel):
         end_rate: float=END_RATE,
         **kwargs
     ) -> None:
-        super(UnetDiffusionModel, self).__init__(start_rate=start_rate, end_rate=end_rate, **kwargs)
+        super(CnnDiffusionModel, self).__init__(start_rate=start_rate, end_rate=end_rate, **kwargs)
         # save the config to init later
         self._config.update({'block_num': block_num, 'latent_dim': [latent_dim] if isinstance(latent_dim, int) else list(latent_dim),})
         # layers
@@ -46,7 +46,7 @@ class UnetDiffusionModel(mlable.models.diffusion.LatentDiffusionModel):
         __shape_o = tuple(input_shape[0])
         __shape_v = tuple(input_shape[-1])
         # build the core diffusion model
-        super(UnetDiffusionModel, self).build(__shape_o)
+        super(CnnDiffusionModel, self).build(__shape_o)
         # init
         self._match_block = tf.keras.layers.UpSampling2D(size=__shape_o[1:3], interpolation="nearest")
         self._extend_block = tf.keras.layers.Dense(units=__shape_o[-1], use_bias=True, kernel_initializer='zeros')
@@ -112,7 +112,7 @@ class UnetDiffusionModel(mlable.models.diffusion.LatentDiffusionModel):
         return self._project_block(__outputs + __residuals)
 
     def get_config(self) -> dict:
-        __config = super(UnetDiffusionModel, self).get_config()
+        __config = super(CnnDiffusionModel, self).get_config()
         __config.update(self._config)
         return __config
 
