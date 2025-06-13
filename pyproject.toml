@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tr1cot"
-version = "0.1.0"
+version = "0.1.1"
 description = "Diffusion on language, with fractal shaping."
 license = ".github/LICENSE.md"
 readme = ".github/README.md"
