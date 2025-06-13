@@ -1,5 +1,4 @@
 import functools
-import itertools
 
 import tensorflow as tf
 
@@ -20,9 +19,8 @@ END_RATE = 0.02 # signal rate at the end of the forward diffusion process
 
 # UTILS ########################################################################
 
-def cycle(data: any) -> iter:
-    __data = data if mlable.utils.iterable(data) else [data]
-    return itertools.cycle(__data)
+def cycle(data: any, count: int) -> list:
+    return list(data) if mlable.utils.iterable(data) else count * [data]
 
 # DIFFUSION ####################################################################
 
@@ -51,13 +49,13 @@ class UnetDiffusionModel(mlable.models.diffusion.LatentDiffusionModel):
         # save for IO serialization
         self._config.update({
             'channel_dim': __block_dim,
-            'group_dim': cycle(group_dim),
-            'head_dim': cycle(head_dim),
-            'head_num': cycle(head_num),
-            'layer_num': cycle(layer_num),
-            'add_attention': cycle(add_attention),
-            'add_downsampling': cycle(add_downsampling),
-            'add_upsampling': cycle(add_upsampling),
+            'group_dim': cycle(group_dim, len(__block_dim)),
+            'head_dim': cycle(head_dim, len(__block_dim)),
+            'head_num': cycle(head_num, len(__block_dim)),
+            'layer_num': cycle(layer_num, len(__block_dim)),
+            'add_attention': cycle(add_attention, len(__block_dim)),
+            'add_downsampling': cycle(add_downsampling, len(__block_dim)),
+            'add_upsampling': cycle(add_upsampling, len(__block_dim)),
             'dropout_rate': max(0.0, dropout_rate),
             'epsilon_rate': max(1e-8, epsilon_rate),})
         # layers
