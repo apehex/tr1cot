@@ -55,8 +55,8 @@ class RateEmbeddingBlock(tf.keras.layers.Layer):
         # transform (B, .., E) => (B, ..., E)
         return self._proj1(self._proj0(__outputs))
 
-    def compute_output_shape(self, input_shape: tuple) -> tuple:
-        return tuple(input_shape) + (self._config['embed_dim'],)
+    def compute_output_shape(self, inputs_shape: tuple) -> tuple:
+        return tuple(inputs_shape) + (self._config['embed_dim'],)
 
     def get_config(self) -> dict:
         __config = super(RateEmbeddingBlock, self).get_config()
