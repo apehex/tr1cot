@@ -8,9 +8,9 @@ import tr1cot.models.cnn
 
 # UNET #########################################################################
 
-class UnetDiffusionModelTest(tf.test.TestCase):
+class CnnDiffusionModelTest(tf.test.TestCase):
     def setUp(self):
-        super(UnetDiffusionModelTest, self).setUp()
+        super(CnnDiffusionModelTest, self).setUp()
         # test cases
         self._cases = [
             {
@@ -33,7 +33,7 @@ class UnetDiffusionModelTest(tf.test.TestCase):
             # parse
             __batch_dim, __height_dim, __width_dim, __feature_dim = tuple(__case['latents'].shape)
             # init
-            __model = tr1cot.models.cnn.UnetDiffusionModel(**__case['args'])
+            __model = tr1cot.models.cnn.CnnDiffusionModel(**__case['args'])
             # build
             __model((__case['latents'], __case['variances']), training=False)
             # extend
@@ -60,7 +60,7 @@ class UnetDiffusionModelTest(tf.test.TestCase):
             # parse
             __batch_dim, __height_dim, __width_dim, __feature_dim = tuple(__case['latents'].shape)
             # init
-            __model = tr1cot.models.cnn.UnetDiffusionModel(**__case['args'])
+            __model = tr1cot.models.cnn.CnnDiffusionModel(**__case['args'])
             # end-to-end
             __outputs = __model((__case['latents'], __case['variances']), training=False)
             self.assertEqual(tuple(__case['shapes']['projected']), tuple(__outputs.shape))
@@ -104,7 +104,7 @@ class UnetDiffusionModelTest(tf.test.TestCase):
             # parse
             __batch_dim, __height_dim, __width_dim, __feature_dim = tuple(__case['latents'].shape)
             # init
-            __model = tr1cot.models.cnn.UnetDiffusionModel(**__case['args'])
+            __model = tr1cot.models.cnn.CnnDiffusionModel(**__case['args'])
             __tokun = tf.keras.models.load_model(__case['tokun'], compile=False)
             # build
             __model.set_vae(__tokun, trainable=False)
@@ -124,7 +124,7 @@ class UnetDiffusionModelTest(tf.test.TestCase):
             # parse
             __batch_dim, __height_dim, __width_dim, __feature_dim = tuple(__case['latents'].shape)
             # init
-            __model = tr1cot.models.cnn.UnetDiffusionModel(**__case['args'])
+            __model = tr1cot.models.cnn.CnnDiffusionModel(**__case['args'])
             __tokun = tf.keras.models.load_model(__case['tokun'], compile=False)
             # build
             __model.set_vae(__tokun, trainable=False)
