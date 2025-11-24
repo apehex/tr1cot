@@ -2,6 +2,7 @@
 .python-version
 .venv
 poetry.lock
+uv.lock
 
 # temp
 dist
