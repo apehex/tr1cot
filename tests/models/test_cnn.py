@@ -107,11 +107,11 @@ class CnnDiffusionModelTest(tf.test.TestCase):
             __model = tr1cot.models.cnn.CnnDiffusionModel(**__case['args'])
             __tokun = tf.keras.models.load_model(__case['tokun'], compile=False)
             # build
-            __model.set_vae(__tokun, trainable=False)
+            __model.set_vae(__tokun)
             __model((__case['latents'], __case['variances']), training=False)
             __tokun(__case['inputs'], training=False)
             # encode into the latent space
-            __latents = __model.preprocess(__case['inputs'])
+            __latents = __model.to_latent(__case['inputs'])
             # compute mean and std deviation
             __mean = tf.math.reduce_mean(__latents)
             __sigma = tf.math.reduce_std(__latents)
@@ -127,9 +127,9 @@ class CnnDiffusionModelTest(tf.test.TestCase):
             __model = tr1cot.models.cnn.CnnDiffusionModel(**__case['args'])
             __tokun = tf.keras.models.load_model(__case['tokun'], compile=False)
             # build
-            __model.set_vae(__tokun, trainable=False)
+            __model.set_vae(__tokun)
             __model((__case['latents'], __case['variances']), training=False)
             __tokun(__case['inputs'], training=False)
             # generate
-            __samples = __model.generate(sample_num=2, step_num=4, logits=True)
+            __samples = __model.generate_samples(sample_num=2, step_num=4, logits=True)
             self.assertEqual((2, __height_dim, __width_dim, 8 * tuple(__case['inputs'].shape)[-1]), tuple(__samples.shape))
