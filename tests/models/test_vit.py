@@ -14,14 +14,14 @@ class VitDiffusionModelTest(tf.test.TestCase):
         # test cases
         self._cases = [
             {
-                'tokun': '../tokun/models/vqvae.4x64.keras',
+                'tokun': 'tokun/vqvae.4x64.keras',
                 'inputs': tf.random.uniform((2, 8, 8, 4), minval=0, maxval=256, dtype=tf.int32),
                 'latents': tf.random.normal((2, 8, 8, 256), dtype=tf.float32),
                 'variances': tf.random.uniform((2, 1, 1, 1), minval=0.0, maxval=1.0, dtype=tf.float32),
                 'args': {'patch_dim': [], 'start_rate': 0.95, 'end_rate': 0.05,},
                 'shapes': {'variances': (2, 8, 8, 1), 'concatenated': (2, 8, 8, 257), 'embedded': (2, 8, 8, 257), 'evened': (2, 8, 8, 256), 'transformed': (2, 8, 8, 256), 'projected': (2, 8, 8, 256),},},
             {
-                'tokun': '../tokun/models/vqvae.1x64.keras',
+                'tokun': 'tokun/vqvae.1x64.keras',
                 'inputs': tf.random.uniform((2, 8, 8, 1), minval=0, maxval=256, dtype=tf.int32),
                 'latents': tf.random.normal((2, 8, 8, 64), dtype=tf.float32),
                 'variances': tf.random.uniform((2, 1, 1, 1), minval=0.0, maxval=1.0, dtype=tf.float32),
